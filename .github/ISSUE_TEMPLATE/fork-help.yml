@@ -1,0 +1,30 @@
+name: Solicitar acceso al repo
+description: Usar solo si no pudiste crear un fork.
+title: "[Acceso repo]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Usa este formulario solo si no pudiste crear un fork.
+  - type: input
+    id: github_user
+    attributes:
+      label: Usuario de GitHub
+      description: Escribe tu usuario sin @.
+      placeholder: octocat
+    validations:
+      required: true
+  - type: input
+    id: participant_name
+    attributes:
+      label: Nombre y medio
+      placeholder: Nombre Apellido - Medio
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Comentario opcional
+      placeholder: Puedes dejar este campo vacio.
+    validations:
+      required: false

@@ -1,0 +1,39 @@
+name: Security exercise
+
+on:
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - main
+      - master
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: security-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  security-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Verify validation harness
+        if: github.event_name == 'pull_request'
+        run: |
+          git diff --exit-code "${{ github.event.pull_request.base.sha }}" -- package.json .github/workflows/security.yml scripts/security-check.mjs tests/submit-endpoint.security.test.js
+
+      - name: Run security checks
+        run: node scripts/security-check.mjs && node --test tests/submit-endpoint.security.test.js

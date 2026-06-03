@@ -1,0 +1,10 @@
+{
+  "name": "ainb-workshop-antigravity-vibecoding",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "security:check": "node scripts/security-check.mjs",
+    "test": "npm run security:check && node --test"
+  }
+}

@@ -1,22 +1,38 @@
-// Handler minimo para un POST /submit de tips o denuncias anonimas.
-// El archivo esta vulnerable a proposito para el ejercicio del workshop.
+// Handler seguro para POST /submit de tips o denuncias anonimas.
+
+const SECURITY_HEADERS = {
+  'Content-Security-Policy': "default-src 'none'",
+  'X-Frame-Options': 'DENY',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains'
+};
+
+function sanitize(input) {
+  if (typeof input !== 'string') return '';
+  return input.replace(/<[^>]*>/g, '').trim();
+}
+
+function isValid(body) {
+  if (!body || typeof body.text !== 'string') return false;
+  if (/<[^>]*>/.test(body.text)) return false;
+  return body.text.trim().length > 0;
+}
+
 export function handleSubmit(request, logger = console) {
   const body = request.body || {};
 
-  logger.info('new tip received', {
-    text: body.text,
-    contact: body.contact,
-    adminToken: process.env.ADMIN_TOKEN
-  });
+  if (!isValid(body)) {
+    return {
+      status: 400,
+      headers: { ...SECURITY_HEADERS },
+      body: { ok: false, error: 'Invalid input' }
+    };
+  }
+
+  logger.info('tip received', { timestamp: new Date().toISOString() });
 
   return {
     status: 200,
-    headers: {},
-    body: {
-      ok: true,
-      text: body.text,
-      contact: body.contact,
-      routedWith: process.env.SECRET_API_KEY
-    }
+    headers: { ...SECURITY_HEADERS },
+    body: { ok: true }
   };
 }
